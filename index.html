@@ -2,528 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fluency</title>
-
-<!-- Fonts & Tailwind -->
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- React, ReactDOM, and Babel for JSX -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
+<meta name="description" content="Fluency">
+<meta name="theme-color" content="#424242">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fluency">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
-  :root {
-    --bg: #ffffff;
-    --ink: #111111;
-    --mute: #8a8a8a;
-    --line: #eeeeee;
-    --soft: #f7f7f6;
-    --edge: #dedede;
-    --tint: #f2f2f7; /* iOS standard background */
-    box-sizing: border-box;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #000000;
-      --ink: #f2f2f0;
-      --mute: #8d8d8d;
-      --line: #2c2c2e;
-      --soft: #1c1c1e;
-      --edge: #38383a;
-      --tint: #000000;
-    }
-  }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: Inter, system-ui, sans-serif;
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
-  }
-  .serif { font-family: 'Source Serif 4', Georgia, serif; }
-  .mute { color: var(--mute); }
-  .line { border-color: var(--line); }
-  .soft { background: var(--soft); }
-  
-  .fade { animation: f 0.4s ease both; }
-  @keyframes f {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: none; }
-  }
+  :root { --bg:#fbfbfb; --ink:#424242; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
 
-  /* iOS Style Toggle */
-  .ios-toggle {
-    appearance: none; width: 50px; height: 30px; border-radius: 30px;
-    background: var(--edge); outline: none; position: relative;
-    transition: background 0.3s; cursor: pointer;
-  }
-  .ios-toggle::after {
-    content: ''; position: absolute; top: 2px; left: 2px;
-    width: 26px; height: 26px; background: white; border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.3s;
-  }
-  .ios-toggle:checked { background: #34c759; }
-  .ios-toggle:checked::after { transform: translateX(20px); }
+  /* Splash: shown for 9 seconds, then fades out */
+  #splash { position:fixed; inset:0; z-index:9999; display:grid; place-items:center;
+    background:var(--bg); transition:opacity .6s ease, visibility .6s; }
+  #splash.hide { opacity:0; visibility:hidden; }
+  #splash img { max-width:100%; max-height:100%; object-fit:contain;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+
+  #app { min-height:100%; padding:env(safe-area-inset-top) 24px env(safe-area-inset-bottom);
+    display:grid; place-items:center; }
+  #app h1 { font-weight:600; letter-spacing:-.02em; }
 </style>
 </head>
-
 <body>
-<div id="root"></div>
 
-<script type="text/babel">
-const { useState, useEffect, useRef } = React;
+<div id="splash" aria-label="Fluency is loading" role="img">
+  <picture>
+    <!-- wide screens: animated GIF; phones/portrait: WebP -->
+    <source media="(min-width:768px) and (orientation:landscape)"
+            srcset="https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/app_splashscreen.gif">
+    <img src="https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/splash/splash7.webp"
+         alt="Fluency" decoding="async" fetchpriority="high">
+  </picture>
+</div>
 
-// Initial built-in words
-const B = [
-  { w: "Susurrus", p: "soo-SUR-us", t: "noun", d: "A soft, whispering or rustling sound, like leaves stirring or distant voices.", e: [["Literary", "The susurrus of the reeds followed us along the empty riverbank."], ["Atmospheric", "A susurrus of gossip moved through the gallery before the curtain was drawn."]] },
-  { w: "Perspicacious", p: "pur-spih-KAY-shus", t: "adjective", d: "Having a ready, penetrating insight; quick to see through the surface of things.", e: [["Professional", "Her perspicacious reading of the market saved the firm a year of losses."], ["Literary", "He was a perspicacious observer, noting what others were too polite to see."]] },
-  { w: "Halcyon", p: "HAL-see-un", t: "adjective", d: "Denoting a period of calm, happiness and untroubled peace, often remembered fondly.", e: [["Nostalgic", "They spoke of those halcyon summers as though the sun had never set."], ["Literary", "A halcyon stillness settled on the harbour at dawn."]] }
-];
+<main id="app">
+  <!-- your app goes here -->
+  <h1>Fluency</h1>
+</main>
 
-const ls = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
-const sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+<script>
+  const SPLASH_MS = 9000;
+  const splash = document.getElementById('splash');
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 700);
+  }, SPLASH_MS);
 
-const today = () => {
-  const d = new Date();
-  return Math.floor((d.getTime() - d.getTimezoneOffset() * 6e4) / 864e5);
-};
-
-const speak = s => {
-  try {
-    const u = new SpeechSynthesisUtterance(s);
-    u.rate = 0.85; speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch (e) {}
-};
-
-// Standard SVGs
-const Ico = ({ d, f, s = 20, className = "" }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill={f ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d={d} />
-  </svg>
-);
-const P = {
-  heart: "M12 21s-7-4.6-9.3-9.2C1.2 8.6 3 5 6.4 5c2 0 3.6 1 5.6 3 2-2 3.6-3 5.6-3C21 5 22.8 8.600 21.300 11.800 19 16.400 12 21 12 21z",
-  share: "M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13",
-  chevronRight: "M9 18l6-6-6-6",
-  chevronLeft: "M15 18l-6-6 6-6",
-  trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2",
-};
-
-function WordView({ word, fav, toggle, detail, goBack }) {
-  const [k, setK] = useState(0);
-  const n = word.e.length;
-  useEffect(() => setK(0), [word]);
-
-  const go = d => setK(Math.max(0, Math.min(n - 1, k + d)));
-
-  return (
-    <div className="fade flex flex-col h-full">
-      {detail && (
-        <div className="grid grid-cols-3 items-center mb-6 pt-2">
-          <button onClick={goBack} className="flex items-center text-blue-500 font-medium">
-            <Ico d={P.chevronLeft} s={24} className="mr-1"/> Back
-          </button>
-          <span className="text-center font-semibold text-sm">Word Details</span>
-          <div className="flex justify-end gap-4 text-blue-500">
-            <button onClick={toggle}><Ico d={P.heart} f={fav} s={22}/></button>
-            <button onClick={() => navigator.clipboard.writeText(word.w)}><Ico d={P.share} s={22}/></button>
-          </div>
-        </div>
-      )}
-
-      <h1 className="serif text-5xl font-bold leading-tight text-center mt-4">{word.w}</h1>
-      <button onClick={() => speak(word.w)} className="serif italic mute text-lg mt-3 block mx-auto">{word.p || "Pronounce"}</button>
-      <p className="serif text-2xl leading-snug text-center mt-5 px-4">{word.d}</p>
-      
-      {!detail && (
-        <button onClick={toggle} className={`block mx-auto mt-8 transition-colors ${fav ? 'text-red-500' : 'mute'}`}>
-          <Ico d={P.heart} f={fav} s={32} />
-        </button>
-      )}
-
-      <div className="mt-auto pb-8 pt-12">
-        <p className="mute text-xs tracking-widest uppercase text-center mb-4">Example {k + 1} of {n}</p>
-        <div className="soft rounded-3xl px-6 py-8 mx-2 serif text-xl leading-relaxed text-center relative shadow-sm border border-[var(--line)]" style={{ minHeight: 140 }}>
-          <span className="absolute top-3 left-4 text-xs font-sans font-semibold mute uppercase">{word.e[k][0]}</span>
-          <div className="mt-2">{word.e[k][1]}</div>
-        </div>
-        
-        <div className="flex justify-center gap-8 mt-10">
-          <button disabled={k === 0} onClick={() => go(-1)} className="p-3 bg-[var(--ink)] text-[var(--bg)] rounded-full disabled:opacity-30">
-            <Ico d={P.chevronLeft} s={24} />
-          </button>
-          <button disabled={k === n - 1} onClick={() => go(1)} className="p-3 bg-[var(--ink)] text-[var(--bg)] rounded-full disabled:opacity-30">
-            <Ico d={P.chevronRight} s={24} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function App() {
-  const [tab, setTab] = useState("today");
-  const [sel, setSel] = useState(null);
-  
-  const [user, setUser] = useState(() => ls("fl_user", null));
-  const accountKey = (key, account = user) => `fl_${key}_${encodeURIComponent((account?.email || "").toLowerCase())}`;
-  const [custom, setCustom] = useState(() => user ? ls(accountKey("custom", user), []) : []);
-  const W = [...B, ...custom];
-  const [fav, setFav] = useState(() => user ? ls(accountKey("fav", user), []) : []);
-  
-  const [rem, setRem] = useState(() => ls("fl_rem", { on: false, t: "07:00" }));
-  const [msg, setMsg] = useState("");
-  const [q, setQ] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  // Keep each signed-in account's words and favourites in a separate local collection.
-  useEffect(() => {
-    setCustom(user ? ls(accountKey("custom", user), []) : []);
-    setFav(user ? ls(accountKey("fav", user), []) : []);
-    setSel(null);
-  }, [user?.email]);
-
-  const td = today();
-  const idx = td % B.length;
-
-  const toast = m => { setMsg(m); setTimeout(() => setMsg(""), 2000); };
-
-  const toggle = i => {
-    const n = fav.includes(i) ? fav.filter(k => k !== i) : [...fav, i];
-    setFav(n); if (user) sv(accountKey("fav"), n);
-  };
-
-  // Google Login Effect (waits for the Google script and the button div)
-  useEffect(() => {
-    if ((tab !== "settings" && tab !== "library") || user) return;
-    let tries = 0;
-    const t = setInterval(() => {
-      const btn = document.getElementById("google-btn");
-      if (window.google?.accounts?.id && btn) {
-        clearInterval(t);
-        try {
-          window.google.accounts.id.initialize({
-            client_id: "1080503592184-f0q9nsb8o6c17lu69rta280n1n4daerk.apps.googleusercontent.com",
-            callback: (res) => {
-              const payload = JSON.parse(atob(res.credential.split('.')[1]));
-              const newUser = { name: payload.name, email: payload.email, picture: payload.picture };
-              setUser(newUser); sv("fl_user", newUser);
-              toast("Signed in successfully");
-            }
-          });
-          window.google.accounts.id.renderButton(btn, { theme: "outline", size: "large", width: 300 });
-        } catch (e) { console.log("Google Init Error", e); }
-      } else if (++tries > 40) {
-        clearInterval(t);
-      }
-    }, 250);
-    return () => clearInterval(t);
-  }, [tab, user]);
-
-  // Demo login for testing UI
-  const demoLogin = () => {
-    const mockUser = { name: "Suresh Kaleyannan", email: "ptjywy5257@privaterelay.appleid.com", picture: "https://ui-avatars.com/api/?name=Suresh+K&background=10b981&color=fff" };
-    setUser(mockUser); sv("fl_user", mockUser);
-  };
-
-  const logout = () => { setUser(null); sv("fl_user", null); };
-
-  // Fetch from Built-in Language API (Free Dictionary API)
-  const addWord = async () => {
-    if (!user) { toast("Sign in to build your Library."); return; }
-    setBusy(true);
-    let target = q.trim();
-    try {
-      if (!target) {
-        for (let i = 0; i < 5 && !target; i++) {
-          const r = await (await fetch("https://random-word-api.herokuapp.com/word")).json();
-          const chk = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${r[0]}`);
-          if (chk.ok) target = r[0];
-        }
-        if (!target) throw new Error("No random word found");
-      }
-
-      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${target}`);
-      if (!res.ok) throw new Error("Not found");
-      const data = await res.json();
-      const entry = data[0];
-      const meaning = entry.meanings[0];
-      
-      let examples = [];
-      entry.meanings.forEach(m => {
-        m.definitions.forEach(d => {
-          if (d.example) examples.push([m.partOfSpeech, d.example]);
-        });
-      });
-      if (examples.length === 0) examples = [["Usage", "Example not available in the dictionary."]];
-      
-      const newWord = {
-        w: entry.word.charAt(0).toUpperCase() + entry.word.slice(1),
-        p: entry.phonetic || entry.phonetics?.find(p => p.text)?.text || "",
-        t: meaning.partOfSpeech,
-        d: meaning.definitions[0].definition,
-        e: examples.slice(0, 5)
-      };
-
-      const n = [...custom, newWord];
-      setCustom(n); sv(accountKey("custom"), n);
-      setQ(""); toast(`Added ${newWord.w}`);
-    } catch (e) {
-      toast("Word not found. Try another.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const navs = [
-    { id: "today", l: "Today", ic: <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z" /> },
-    { id: "library", l: "Library", ic: <path d="M4 5v14M8 5v14M12 5v14M16 5l3 14M20 5l-3 14" /> },
-    { id: "favs", l: "Favourites", ic: <path d={P.heart} /> },
-    { id: "settings", l: "Settings", ic: <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /> }
-  ];
-
-  return (
-    <div className="max-w-md mx-auto h-screen flex flex-col relative" style={{ background: tab === 'settings' ? 'var(--tint)' : 'var(--bg)' }}>
-      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-4 px-6 pt-6">
-        
-        {sel !== null && (
-          <WordView word={W[sel]} fav={fav.includes(sel)} toggle={() => toggle(sel)} detail={true} goBack={() => setSel(null)} />
-        )}
-
-        {sel === null && tab === "today" && (
-          <WordView word={W[idx]} fav={fav.includes(idx)} toggle={() => toggle(idx)} />
-        )}
-
-        {sel === null && tab === "library" && (
-          <div className="fade pb-10">
-            <h2 className="serif text-4xl font-bold mb-6">Library</h2>
-            {!user ? (
-              <div className="soft rounded-2xl border line px-5 py-8 text-center">
-                <p className="font-medium">Sign in to start your Library</p>
-                <p className="mute text-sm mt-2">Your words will be kept separately for your account on this device.</p>
-                <div id="google-btn" className="mt-5 flex justify-center"></div>
-              </div>
-            ) : (
-              <>
-                <div className="flex gap-2 mb-8">
-                  <input value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === "Enter" && addWord()} placeholder="Search a word..." className="soft rounded-xl px-4 py-3 text-sm flex-1 border line outline-none focus:border-blue-400" />
-                  <button disabled={busy} onClick={addWord} className="bg-[var(--ink)] text-[var(--bg)] px-5 rounded-xl font-medium disabled:opacity-50">
-                    {busy ? "..." : "Add"}
-                  </button>
-                </div>
-                {custom.length === 0 ? (
-                  <p className="mute text-sm mt-10 text-center">Your Library is empty. Search for a word to add it.</p>
-                ) : (
-                  <ul>
-                    {custom.map((w, i) => {
-                      const wordIndex = B.length + i;
-                      return (
-                        <li key={`${w.w}-${i}`}>
-                          <button onClick={() => setSel(wordIndex)} className="w-full text-left py-4 border-b line flex items-baseline justify-between active:opacity-50">
-                            <span className="serif text-2xl font-semibold">{w.w}</span>
-                            <span className="mute text-xs">{fav.includes(wordIndex) && <span className="text-red-500 mr-1">♥</span>}{w.t}</span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {sel === null && tab === "favs" && (
-          <div className="fade">
-            <h2 className="serif text-4xl font-bold mb-6">Favourites</h2>
-            {fav.length === 0 ? (
-              <p className="mute text-sm mt-10 text-center">Nothing saved yet. Tap the heart on a word you love.</p>
-            ) : (
-              <ul>
-                {fav.map(i => W[i] && (
-                  <li key={i}>
-                    <button onClick={() => setSel(i)} className="w-full text-left py-4 border-b line flex items-baseline justify-between active:opacity-50">
-                      <span className="serif text-2xl font-semibold">{W[i].w}</span>
-                      <span className="mute text-xs text-red-500">♥</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {sel === null && tab === "settings" && (
-          <div className="fade pb-10 -mx-6 bg-[var(--tint)]">
-            <div className="px-6 text-center py-2 font-semibold text-lg border-b line bg-[var(--bg)] sticky top-0 z-10">Settings</div>
-            
-            {/* ACCOUNT SECTION */}
-            <div className="text-xs text-gray-500 uppercase tracking-wider ml-8 mb-2 mt-8 font-medium">Account</div>
-            <div className="bg-[var(--soft)] rounded-xl mx-4 overflow-hidden border line shadow-sm">
-              {user ? (
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <img src={user.picture} width={40} height={40} className="rounded-full" alt="avatar"/>
-                    <div className="truncate">
-                      <div className="font-semibold text-sm truncate">{user.name}</div>
-                      <div className="text-gray-500 text-xs truncate">{user.email}</div>
-                    </div>
-                  </div>
-                  <button onClick={logout} className="text-red-500 text-sm font-medium pl-3 whitespace-nowrap">Sign Out</button>
-                </div>
-              ) : (
-                <div className="p-5 flex flex-col items-center justify-center gap-3">
-                  <div id="google-btn"></div>
-                </div>
-              )}
-            </div>
-            {user && <div className="text-xs text-gray-500 mx-8 mt-2 mb-6">Your Library and favourites are saved on this device for this account.</div>}
-
-            {user && (
-              <>
-                <div className="bg-[var(--soft)] rounded-xl mx-4 overflow-hidden border line shadow-sm mt-4">
-                  <button className="w-full p-4 flex items-center gap-3 text-red-500 active:bg-gray-100 dark:active:bg-gray-800">
-                    <Ico d={P.trash} s={20} />
-                    <span className="font-medium text-sm">Delete Account</span>
-                  </button>
-                </div>
-                <div className="text-xs text-gray-400 mx-8 mt-2 mb-8">Permanently delete your account and all associated data. This action cannot be undone.</div>
-              </>
-            )}
-
-            {/* NOTIFICATIONS SECTION */}
-            <div className="text-xs text-gray-500 uppercase tracking-wider ml-8 mb-2 mt-6 font-medium">Notifications</div>
-            <div className="bg-[var(--soft)] rounded-xl mx-4 overflow-hidden border line shadow-sm">
-              <div className="p-4 flex justify-between items-center">
-                <div className="flex gap-3 items-center">
-                  <div className="bg-blue-500 rounded-lg p-1.5 text-white">
-                    <Ico d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" f={true} s={16}/>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">Daily Word Notifications</div>
-                    <div className="text-gray-500 text-[11px]">Get notified when your new word is ready</div>
-                  </div>
-                </div>
-                <input type="checkbox" className="ios-toggle" checked={rem.on} onChange={e => {
-                  const n = { ...rem, on: e.target.checked };
-                  setRem(n); sv("fl_rem", n);
-                }} />
-              </div>
-            </div>
-            <div className="text-xs text-gray-500 mx-8 mt-2 mb-8">Receive a daily notification at 7 AM when your new word is available.</div>
-
-            {/* AVAILABLE FEATURES SECTION */}
-            <div className="text-xs text-gray-500 uppercase tracking-wider ml-8 mb-2 mt-2 font-medium">Our Other Apps</div>
-            <div className="bg-[var(--soft)] rounded-xl mx-4 overflow-hidden border line shadow-sm flex flex-col">
-              
-              <div className="p-4 flex justify-between items-center border-b line">
-                <div className="flex gap-3 items-center">
-                  <div className="bg-blue-500 rounded-lg p-1.5 text-white">
-                    <svg width={16} height={16} fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">App 1</div>
-                    <div className="text-gray-500 text-[11px]">About Our App</div>
-                  </div>
-                </div>
-                <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded">GET</span>
-              </div>
-
-              <div className="p-4 flex justify-between items-center border-b line">
-                <div className="flex gap-3 items-center">
-           <div className="bg-blue-500 rounded-lg p-1.5 text-white">
-                    <svg width={16} height={16} fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">App 1</div>
-                    <div className="text-gray-500 text-[11px]">About Our App</div>
-                  </div>
-                </div>
-                <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded">GET</span>
-              </div>
-
-              <div className="p-4 flex justify-between items-center">
-                <div className="flex gap-3 items-center">
-                   <div className="bg-blue-500 rounded-lg p-1.5 text-white">
-                    <svg width={16} height={16} fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">App 1</div>
-                    <div className="text-gray-500 text-[11px]">About Our App</div>
-                  </div>
-                </div>
-                <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded">GET</span>
-              </div>
-            </div>
-            <div className="text-xs text-gray-500 mx-8 mt-2 mb-8">Download Our Other Apps from Store </div>
-
-            {/* HELP & SUPPORT */}
-            <div className="text-xs text-gray-500 uppercase tracking-wider ml-8 mb-2 mt-2 font-medium">Help & Support</div>
-            <div className="bg-[var(--soft)] rounded-xl mx-4 overflow-hidden border line shadow-sm">
-              <a href="mailto:hello@suresh.app" className="p-4 flex justify-between items-center active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
-                <div className="flex gap-3 items-center">
-                  <div className="bg-blue-500 rounded-lg p-1.5 text-white">
-                    <Ico d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" s={16}/>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm text-black dark:text-white">Help & Support</div>
-                    <div className="text-gray-500 text-[11px]">hello@suresh.app</div>
-                  </div>
-                </div>
-                <Ico d={P.chevronRight} s={20} className="text-gray-300" />
-              </a>
-            </div>
-            <div className="text-xs text-gray-500 mx-8 mt-2 mb-8">Have feedback or need help? We read every message.</div>
-
-            {/* ABOUT */}
-            <div className="bg-[var(--soft)] rounded-xl mx-4 overflow-hidden border line shadow-sm mb-6">
-              <div className="p-4 flex gap-3 items-center">
-                <div className="bg-blue-500 rounded-lg p-1.5 text-white">
-                  <Ico d="M12 16v-4M12 8h.01M22 12A10 10 0 112 12a10 10 0 0120 0z" s={16}/>
-                </div>
-                <div>
-                  <div className="font-medium text-sm">About Fluency</div>
-                  <div className="text-gray-500 text-[11px]">Version 1.0</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        )}
-      </main>
-
-      {/* Toast Notification */}
-      {msg && (
-        <div className="fixed left-1/2 -translate-x-1/2 bottom-24 bg-[var(--ink)] text-[var(--bg)] rounded-full px-5 py-2.5 text-sm font-medium fade shadow-lg z-50 whitespace-nowrap">
-          {msg}
-        </div>
-      )}
-
-      {/* Bottom Nav */}
-      <nav className="flex border-t line bg-[var(--bg)] pb-safe relative z-20">
-        {navs.map(n => (
-          <button key={n.id} onClick={() => { setTab(n.id); setSel(null); }} className={`flex-1 flex flex-col items-center gap-1.5 py-3 pt-4 text-[10px] font-medium transition-colors ${tab === n.id ? "text-[var(--ink)]" : "mute"}`}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {n.ic}
-            </svg>
-            {n.l}
-          </button>
-        ))}
-      </nav>
-    </div>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () =>
+      navigator.serviceWorker.register('sw.js').catch(console.error));
+  }
 </script>
 </body>
 </html>
-
