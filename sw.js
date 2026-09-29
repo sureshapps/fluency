@@ -1,12 +1,8 @@
-const VERSION = 'fluency-v1';
+const VERSION = 'fluency-v2';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
-const SPLASH = [
-  'https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/app_splashscreen.gif',
-  'https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/splash/splash7.webp'
-];
 const SHELL_FILES = [
-  './', './index.html', './manifest.webmanifest',
+  './', './index.html', './manifest.webmanifest', './spc2.svg',
   './icons/192.png', './icons/512.png', './icons/maskable-512.png',
   './icons/apple-touch-icon.png', './icons/favicon-32.png'
 ];
@@ -14,9 +10,6 @@ const SHELL_FILES = [
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     await (await caches.open(SHELL)).addAll(SHELL_FILES);
-    // cross-origin splash art: no-cors so it caches as opaque; failures shouldn't block install
-    const rt = await caches.open(RUNTIME);
-    await Promise.allSettled(SPLASH.map(u => rt.add(new Request(u, { mode: 'no-cors' }))));
     await self.skipWaiting();
   })());
 });
@@ -39,13 +32,13 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).catch(() => caches.match('./index.html')));
     return;
   }
-  // Splash art + same-origin assets: cache first, fill cache on miss
-  if (SPLASH.includes(req.url) || url.origin === location.origin) {
+  // Same-origin assets: cache first, fill cache on miss
+  if (url.origin === location.origin) {
     e.respondWith((async () => {
       const hit = await caches.match(req);
       if (hit) return hit;
-      const res = await fetch(SPLASH.includes(req.url) ? new Request(req, { mode: 'no-cors' }) : req);
-      if (res.ok || res.type === 'opaque') (await caches.open(RUNTIME)).put(req, res.clone());
+      const res = await fetch(req);
+      if (res.ok) (await caches.open(RUNTIME)).put(req, res.clone());
       return res;
     })());
   }
