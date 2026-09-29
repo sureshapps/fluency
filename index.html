@@ -1,300 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-    <title>Fluency</title>
-    <meta name="description" content="Fluency">
-    <meta name="theme-color" content="#424242">
-    <link rel="manifest" href="manifest.webmanifest">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Fluency">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Fluency</title>
+<meta name="description" content="Fluency">
+<meta name="theme-color" content="#424242">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fluency">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-    <!-- Fonts & Tailwind -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+<!-- Fonts & Tailwind -->
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- React, ReactDOM, and Babel for JSX -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- React, ReactDOM, and Babel for JSX -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <style>
-        :root {
-            --bg: #ffffff;
-            --ink: #111111;
-            --mute: #8a8a8a;
-            --line: #eeeeee;
-            --soft: #f7f7f6;
-            --edge: #dedede;
-            --tint: #f2f2f7;
-            box-sizing: border-box;
-            padding-top: env(safe-area-inset-top, 0px);
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-        }
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #111111;
+    --mute: #8a8a8a;
+    --line: #eeeeee;
+    --soft: #f7f7f6;
+    --edge: #dedede;
+    --tint: #f2f2f7;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --ink: #f2f2f0;
+      --mute: #8d8d8d;
+      --line: #2c2c2e;
+      --soft: #1c1c1e;
+      --edge: #38383a;
+      --tint: #000000;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  .serif { font-family: 'Source Serif 4', Georgia, serif; }
+  .mute { color: var(--mute); }
+  .line { border-color: var(--line); }
+  .soft { background: var(--soft); }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #000000;
-                --ink: #f2f2f0;
-                --mute: #8d8d8d;
-                --line: #2c2c2e;
-                --soft: #1c1c1e;
-                --edge: #38383a;
-                --tint: #000000;
-            }
-        }
+  .fade { animation: f 0.4s ease both; }
+  @keyframes f {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
 
-        * {
-            box-sizing: border-box;
-        }
+  /* Startup flow: spc2.svg (5s) -> box loader (3s) -> app */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center;
+    background: var(--bg); transition: opacity .6s ease, visibility .6s;
+  }
+  #splash.hide { opacity: 0; visibility: hidden; }
+  #splash .stage {
+    grid-area: 1 / 1; display: grid; place-items: center; width: 100%; height: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    transition: opacity .5s ease, visibility .5s;
+  }
+  #splash .stage.off { opacity: 0; visibility: hidden; }
+  #stage-logo img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
-        html,
-        body {
-            height: 100%;
-        }
+  /* Box loader (no colour: uses the theme ink colour) */
+  .wrapper { position: relative; }
+  .box-wrap { display: flex; gap: 8px; align-items: center; justify-content: center; height: 40px; }
+  .box {
+    width: 10px; height: 10px; border-radius: 2px; background: var(--ink); opacity: .2;
+    animation: box-pulse 1.2s ease-in-out infinite;
+  }
+  .box.two   { animation-delay: .1s; }
+  .box.three { animation-delay: .2s; }
+  .box.four  { animation-delay: .3s; }
+  .box.five  { animation-delay: .4s; }
+  .box.six   { animation-delay: .5s; }
+  @keyframes box-pulse {
+    0%, 60%, 100% { transform: scaleY(1); opacity: .2; }
+    30%           { transform: scaleY(3); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .box { animation: none; opacity: .6; } }
 
-        body {
-            background: var(--bg);
-            color: var(--ink);
-            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+  /* Onboarding (4 swipeable slides, shown after loading) */
+  #onboarding {
+    position: fixed; inset: 0; z-index: 9000; background: var(--bg);
+    display: flex; flex-direction: column; transition: opacity .5s ease, visibility .5s;
+  }
+  #onboarding.gone { opacity: 0; visibility: hidden; }
+  #ob-track {
+    flex: 1; display: flex; overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  #ob-track::-webkit-scrollbar { display: none; }
+  .ob-slide {
+    flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 0 40px 160px;
+  }
+  .ob-icon { width: 64px; height: 64px; margin-bottom: 40px; color: var(--ink); }
+  .ob-icon svg { width: 100%; height: 100%; overflow: visible; }
+  .ob-title { font-size: 26px; font-weight: 700; letter-spacing: -.01em; margin: 0 0 18px; }
+  .ob-text  { font-size: 17px; line-height: 1.5; color: var(--mute); margin: 0; max-width: 300px; }
+  .ob-bottom {
+    position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column;
+    align-items: center; gap: 44px; padding: 0 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+  .ob-dots { display: flex; gap: 14px; padding: 10px 18px; border-radius: 20px; background: var(--tint, #f2f2f7); }
+  .ob-dots i { width: 10px; height: 10px; border-radius: 50%; background: #b5b5b8; transition: background .25s; }
+  .ob-dots i.on { background: var(--bg); box-shadow: 0 0 0 1px var(--line); }
+  #ob-btn {
+    width: 100%; max-width: 560px; height: 62px; border: 0; border-radius: 22px; cursor: pointer;
+    background: var(--ink); color: var(--bg); font: 600 18px Inter, system-ui, sans-serif;
+  }
+  #ob-btn:active { opacity: .85; }
 
-        .serif {
-            font-family: 'Source Serif 4', Georgia, serif;
-        }
-
-        .mute {
-            color: var(--mute);
-        }
-
-        .line {
-            border-color: var(--line);
-        }
-
-        .soft {
-            background: var(--soft);
-        }
-
-        .fade {
-            animation: f 0.9s ease both;
-        }
-
-        @keyframes f {
-            from {
-                opacity: 0;
-                transform: translateY(4px);
-            }
-
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        /* Startup flow: spc2.svg (5s) -> box loader (3s) -> app */
-        #splash {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: grid;
-            place-items: center;
-            background: var(--bg);
-            transition: opacity .6s ease, visibility .6s;
-        }
-
-        #splash.hide {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        #splash .stage {
-            grid-area: 1 / 1;
-            display: grid;
-            place-items: center;
-            width: 100%;
-            height: 100%;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            transition: opacity .5s ease, visibility .5s;
-        }
-
-        #splash .stage.off {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        #stage-logo img {
-            max-width: 50%;
-            max-height: 50%;
-            object-fit: contain;
-        }
-
-        /* Box loader (no colour: uses the theme ink colour) */
-        .wrapper {
-            position: relative;
-        }
-
-        .box-wrap {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            justify-content: center;
-            height: 40px;
-        }
-
-        .box {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            background: var(--ink);
-            opacity: .2;
-            animation: box-pulse 1.2s ease-in-out infinite;
-        }
-
-        .box.two {
-            animation-delay: .1s;
-        }
-
-        .box.three {
-            animation-delay: .2s;
-        }
-
-        .box.four {
-            animation-delay: .3s;
-        }
-
-        .box.five {
-            animation-delay: .4s;
-        }
-
-        .box.six {
-            animation-delay: .5s;
-        }
-
-        @keyframes box-pulse {
-
-            0%,
-            60%,
-            100% {
-                transform: scaleY(1);
-                opacity: .2;
-            }
-
-            30% {
-                transform: scaleY(3);
-                opacity: 1;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .box {
-                animation: none;
-                opacity: .6;
-            }
-        }
-
-        /* iOS Style Toggle */
-        .ios-toggle {
-            appearance: none;
-            width: 50px;
-            height: 30px;
-            border-radius: 30px;
-            background: var(--edge);
-            outline: none;
-            position: relative;
-            transition: background 0.3s;
-            cursor: pointer;
-        }
-
-        .ios-toggle::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 26px;
-            height: 26px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
-        }
-
-        .ios-toggle:checked {
-            background: #34c759;
-        }
-
-        .ios-toggle:checked::after {
-            transform: translateX(20px);
-        }
-    </style>
+  /* iOS Style Toggle */
+  .ios-toggle {
+    appearance: none; width: 50px; height: 30px; border-radius: 30px;
+    background: var(--edge); outline: none; position: relative;
+    transition: background 0.3s; cursor: pointer;
+  }
+  .ios-toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 26px; height: 26px; background: white; border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.3s;
+  }
+  .ios-toggle:checked { background: #34c759; }
+  .ios-toggle:checked::after { transform: translateX(20px); }
+</style>
 </head>
 
 <body>
 
-    <!-- Startup flow: 1) spc2.svg for 5s, 2) box loader for 3s -->
-    <div id="splash" aria-label="Fluency is loading" role="img">
-        <div class="stage" id="stage-logo">
-            <img id="logo-img" src="https://fluency.snet.my/spc2.svg" alt="Fluency" decoding="async" fetchpriority="high">
-        </div>
-        <div class="stage off" id="stage-loader">
-            <div class="wrapper">
-                <div class="box-wrap">
-                    <div class="box one"></div>
-                    <div class="box two"></div>
-                    <div class="box three"></div>
-                    <div class="box four"></div>
-                    <div class="box five"></div>
-                    <div class="box six"></div>
-                </div>
-            </div>
-        </div>
+<!-- Startup flow: 1) spc2.svg for 5s, 2) box loader for 3s -->
+<div id="splash" aria-label="Fluency is loading" role="img">
+  <div class="stage" id="stage-logo">
+    <img id="logo-img" src="spc2.svg" alt="Fluency" decoding="async" fetchpriority="high">
+  </div>
+  <div class="stage off" id="stage-loader">
+    <div class="wrapper">
+      <div class="box-wrap">
+        <div class="box one"></div>
+        <div class="box two"></div>
+        <div class="box three"></div>
+        <div class="box four"></div>
+        <div class="box five"></div>
+        <div class="box six"></div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div id="root"></div>
+<!-- Onboarding: swipe left through 4 slides -->
+<div id="onboarding" role="dialog" aria-label="Welcome to Fluency" hidden>
+  <div id="ob-track">
+    <section class="ob-slide"><div class="ob-icon"><svg viewBox="0 0 64 64" fill="currentColor"><path d="M2 48V24C2 12 9 4 20 4h9v42c-6-5-15-5-21 2-3 3-6 2-6-2z" transform="translate(0 6)"/><path d="M2 48V24C2 12 9 4 20 4h9v42c-6-5-15-5-21 2-3 3-6 2-6-2z" transform="translate(64 6) scale(-1 1)"/></svg></div><h2 class="ob-title">Word of the Day</h2><p class="ob-text">Expand your vocabulary with carefully curated words and their meanings</p></section>
+    <section class="ob-slide"><div class="ob-icon"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="14" cy="14" r="7" fill="currentColor" stroke="none"/><circle cx="32" cy="14" r="7" fill="currentColor" stroke="none"/><path d="M8 18c-1 6-2 10-5 12M26 18c-1 6-2 10-5 12" stroke-width="5"/><path d="M44 8h16M44 22h16M4 40h56M4 56h56" stroke-width="5"/></svg></div><h2 class="ob-title">Learn in Context</h2><p class="ob-text">See each word used in five different real-world examples</p></section>
+    <section class="ob-slide"><div class="ob-icon"><svg viewBox="0 0 64 64"><rect x="2" y="4" width="60" height="56" rx="10" fill="currentColor"/><rect x="8" y="18" width="48" height="36" rx="5" fill="var(--bg)"/><g fill="currentColor"><rect x="30" y="24" width="6" height="6" rx="1.5"/><rect x="41" y="24" width="6" height="6" rx="1.5"/><rect x="19" y="34" width="6" height="6" rx="1.5"/><rect x="30" y="34" width="6" height="6" rx="1.5"/><rect x="41" y="34" width="6" height="6" rx="1.5"/><rect x="19" y="44" width="6" height="6" rx="1.5"/><rect x="30" y="44" width="6" height="6" rx="1.5"/></g></svg></div><h2 class="ob-title">Daily Learning</h2><p class="ob-text">Build your knowledge consistently with a new word every day</p></section>
+    <section class="ob-slide"><div class="ob-icon"><svg viewBox="0 0 64 64" fill="currentColor"><path d="M32 0C34 20 44 30 64 32C44 34 34 44 32 64C30 44 20 34 0 32C20 30 30 20 32 0Z" transform="translate(22 24) scale(.66)"/><path d="M32 0C34 20 44 30 64 32C44 34 34 44 32 64C30 44 20 34 0 32C20 30 30 20 32 0Z" transform="translate(2 12) scale(.36)"/><path d="M32 0C34 20 44 30 64 32C44 34 34 44 32 64C30 44 20 34 0 32C20 30 30 20 32 0Z" transform="translate(28 -2) scale(.28)"/></svg></div><h2 class="ob-title">Ready to Begin?</h2><p class="ob-text">Start your journey to eloquence today</p></section>
+  </div>
+  <div class="ob-bottom">
+    <div class="ob-dots" id="ob-dots"><i class="on"></i><i></i><i></i><i></i></div>
+    <button id="ob-btn" type="button">Continue</button>
+  </div>
+</div>
 
-    <script>
-        const LOGO_MS = 7000; // spc2.svg
-        const LOADER_MS = 5000; // box loader
-        const splash = document.getElementById('splash');
-        const stageLogo = document.getElementById('stage-logo');
-        const stageLoader = document.getElementById('stage-loader');
-        let started = false;
+<div id="root"></div>
 
-        function startFlow() {
-            if (started) return;
-            started = true;
-            setTimeout(() => {
-                stageLogo.classList.add('off');
-                stageLoader.classList.remove('off');
-                setTimeout(() => {
-                    splash.classList.add('hide');
-                    setTimeout(() => splash.remove(), 700);
-                }, LOADER_MS);
-            }, LOGO_MS);
-        }
-        // start the 5s clock once the SVG is actually on screen (so its draw animation isn't cut short)
-        const logoImg = document.getElementById('logo-img');
-        logoImg.addEventListener('load', startFlow);
-        logoImg.addEventListener('error', startFlow);
-        setTimeout(startFlow, 2000); // safety net
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () =>
-                navigator.serviceWorker.register('sw.js').catch(console.error));
-        }
-    </script>
+<script>
+  const LOGO_MS = 5000;    // spc2.svg
+  const LOADER_MS = 3000;  // box loader
+  const splash = document.getElementById('splash');
+  const stageLogo = document.getElementById('stage-logo');
+  const stageLoader = document.getElementById('stage-loader');
+  let started = false;
+  function startFlow() {
+    if (started) return; started = true;
+    setTimeout(() => {
+      stageLogo.classList.add('off');
+      stageLoader.classList.remove('off');
+      setTimeout(() => {
+        splash.classList.add('hide');
+        setTimeout(() => splash.remove(), 700);
+      }, LOADER_MS);
+    }, LOGO_MS);
+  }
+  // start the 5s clock once the SVG is actually on screen (so its draw animation isn't cut short)
+  const logoImg = document.getElementById('logo-img');
+  logoImg.addEventListener('load', startFlow);
+  logoImg.addEventListener('error', startFlow);
+  setTimeout(startFlow, 2000); // safety net
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+
+  // ---- Onboarding (shown once after loading; add ?onboarding to the URL to see it again) ----
+  (function () {
+    const ob = document.getElementById('onboarding');
+    const track = document.getElementById('ob-track');
+    const btn = document.getElementById('ob-btn');
+    const dots = [...document.querySelectorAll('#ob-dots i')];
+    const n = dots.length;
+    let seen = false;
+    try { seen = localStorage.getItem('fluency-onboarded') === '1'; } catch (e) {}
+    if (seen && !/[?&]onboarding/.test(location.search)) { ob.remove(); return; }
+    ob.hidden = false;
+    const idx = () => Math.round(track.scrollLeft / track.clientWidth);
+    function sync() {
+      const i = Math.max(0, Math.min(n - 1, idx()));
+      dots.forEach((d, k) => d.classList.toggle('on', k === i));
+      btn.textContent = i === n - 1 ? 'Get Started' : 'Continue';
+    }
+    track.addEventListener('scroll', sync, { passive: true });
+    btn.addEventListener('click', () => {
+      const i = idx();
+      if (i < n - 1) { track.scrollTo({ left: (i + 1) * track.clientWidth, behavior: 'smooth' }); return; }
+      try { localStorage.setItem('fluency-onboarded', '1'); } catch (e) {}
+      ob.classList.add('gone');
+      setTimeout(() => ob.remove(), 600);
+    });
+  })();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () =>
+      navigator.serviceWorker.register('sw.js').catch(console.error));
+  }
+</script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
 
 // Initial built-in words
 const B = [
@@ -708,5 +662,4 @@ function App() {
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
-
 </html>
