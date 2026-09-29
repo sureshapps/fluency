@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fluency</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+:root{--bg:#fff;--ink:#111;--mute:#8a8a8a;--line:#eee;--soft:#f7f7f6;--edge:#dedede;--tint:#f0f0f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--ink:#f2f2f0;--mute:#8d8d8d;--line:#232323;--soft:#171717;--edge:#2e2e2e;--tint:#181822}}
+:root[data-theme="dark"]{--bg:#0e0e0e;--ink:#f2f2f0;--mute:#8d8d8d;--line:#232323;--soft:#171717;--edge:#2e2e2e;--tint:#181822}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;margin:0;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Source Serif 4',Georgia,serif}
+.mute{color:var(--mute)}.line{border-color:var(--line)}.soft{background:var(--soft)}
+.btn{border:1px solid var(--line);border-radius:999px;padding:.6rem 1.1rem;font-size:.85rem;transition:.2s}
+.btn:active{transform:scale(.97)}.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{border:1px solid var(--edge);border-radius:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.fade{animation:f .5s ease both}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style></head>
+<body><div id="root"></div>
+<script>
+const {useState,useEffect}=React,h=React.createElement;
+const B=[
+{w:"Susurrus",p:"soo-SUR-us",t:"noun",d:"A soft, whispering or rustling sound, like leaves stirring or distant voices.",e:[["Literary","The susurrus of the reeds followed us along the empty riverbank."],["Atmospheric","A susurrus of gossip moved through the gallery before the curtain was drawn."],["Professional","In the hush of the boardroom, only the susurrus of turning pages remained."],["Poetic","She fell asleep to the susurrus of rain against the attic glass."],["Formal","The translator described the poem as a susurrus that never quite becomes speech."]]},
+{w:"Perspicacious",p:"pur-spih-KAY-shus",t:"adjective",d:"Having a ready, penetrating insight; quick to see through the surface of things.",e:[["Professional","Her perspicacious reading of the market saved the firm a year of losses."],["Literary","He was a perspicacious observer, noting what others were too polite to see."],["Formal","A perspicacious editor knows which sentence the essay is quietly hiding behind."],["Wry","The child's perspicacious question silenced the entire dinner table."],["Academic","The report is perspicacious about causes, and modest about cures."]]},
+{w:"Halcyon",p:"HAL-see-un",t:"adjective",d:"Denoting a period of calm, happiness and untroubled peace, often remembered fondly.",e:[["Nostalgic","They spoke of those halcyon summers as though the sun had never set."],["Literary","A halcyon stillness settled on the harbour at dawn."],["Professional","The team's halcyon quarter ended the day the new competitor arrived."],["Reflective","We rarely recognise our halcyon days until they are behind us."],["Speech","Let us not confuse a halcyon past with a flawless one."]]},
+{w:"Lacuna",p:"luh-KYOO-nuh",t:"noun",d:"A gap or missing part, especially in a manuscript, argument or body of knowledge.",e:[["Academic","The archive contains a lacuna of nearly a decade between the two letters."],["Professional","Our data has a lacuna exactly where the customer complaints begin."],["Literary","In the middle of her memory lay a lacuna she had learned to walk around."],["Formal","The paper's central lacuna is the absence of any control group."],["Reflective","Silence, too, can be a lacuna that speaks."]]},
+{w:"Equanimity",p:"ee-kwuh-NIM-ih-tee",t:"noun",d:"Mental calmness and evenness of temper, especially under pressure.",e:[["Professional","She received the criticism with an equanimity that disarmed the room."],["Speech","Leadership is often just equanimity when others have lost theirs."],["Literary","He accepted the storm and the sunrise with the same equanimity."],["Reflective","Equanimity is not indifference; it is caring without clenching."],["Formal","The judge delivered the verdict with studied equanimity."]]},
+{w:"Ineffable",p:"in-EF-uh-bul",t:"adjective",d:"Too great or extreme to be expressed in words; beyond description.",e:[["Literary","An ineffable sadness rose in her as the train pulled away."],["Poetic","There is something ineffable in the way light leaves a room."],["Reflective","Grief is ineffable until, one day, it finds its sentence."],["Formal","The chef declined to explain the dish, calling its charm ineffable."],["Speech","Some gratitude is simply ineffable, so I will say only: thank you."]]},
+{w:"Mellifluous",p:"muh-LIF-loo-us",t:"adjective",d:"Sweet and smoothly flowing to the ear; pleasant to listen to.",e:[["Speech","Her mellifluous delivery made even the budget sound like poetry."],["Literary","A mellifluous voice drifted from the open window of the cello school."],["Professional","The host's mellifluous tone kept listeners through the long interview."],["Wry","He mistook a mellifluous voice for a sound argument."],["Poetic","The river spoke in mellifluous syllables over the stones."]]},
+{w:"Petrichor",p:"PET-rih-kor",t:"noun",d:"The distinctive, earthy scent that rises from dry ground when rain first falls.",e:[["Literary","The petrichor rose from the pavement as the first drops landed."],["Poetic","She loved the petrichor more than the rain that made it."],["Descriptive","A faint petrichor lingered in the courtyard long after the storm."],["Reflective","Certain memories arrive like petrichor: sudden, earthy, and unbidden."],["Casual","Open the window, you can smell the petrichor from here."]]},
+{w:"Verisimilitude",p:"vair-ih-sih-MIL-ih-tood",t:"noun",d:"The quality of appearing true or real; a convincing likeness of reality.",e:[["Literary","The novel's verisimilitude comes from its stubbornly ordinary details."],["Professional","Good product demos need verisimilitude, not just polish."],["Academic","The film sacrifices historical accuracy for emotional verisimilitude."],["Formal","Her testimony had verisimilitude, yet the facts did not agree."],["Wry","A single wrinkled sock gave the staged room its verisimilitude."]]},
+{w:"Sagacious",p:"suh-GAY-shus",t:"adjective",d:"Having or showing keen judgement and practical wisdom, especially in difficult matters.",e:[["Professional","A sagacious founder knows which fires to leave burning."],["Literary","The old harbourmaster gave sagacious counsel, and rarely gave it twice."],["Speech","Be sagacious with your promises; they are cheap to make and costly to break."],["Formal","The committee's sagacious restraint spared the town a needless dispute."],["Reflective","Sagacious people ask a better second question."]]}
+];
+let W=B;
+const cap=async n=>{try{return await claude.use(n)}catch(e){return null}};
+const ok=x=>x&&typeof x.w==="string"&&typeof x.p==="string"&&typeof x.t==="string"&&typeof x.d==="string"&&Array.isArray(x.e)&&x.e.length>0&&x.e.every(e=>Array.isArray(e)&&typeof e[0]==="string"&&typeof e[1]==="string");
+const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const today=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
+const fmt=n=>new Date(n*864e5).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",timeZone:"UTC"});
+const speak=s=>{try{const u=new SpeechSynthesisUtterance(s);u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}};
+const Ico=({d,f,s})=>h("svg",{width:s||20,height:s||20,viewBox:"0 0 24 24",fill:f?"currentColor":"none",stroke:"currentColor",strokeWidth:1.5,strokeLinecap:"round",strokeLinejoin:"round"},h("path",{d}));
+const P={heart:"M12 21s-7-4.6-9.3-9.2C1.2 8.6 3 5 6.4 5c2 0 3.6 1 5.6 3 2-2 3.6-3 5.6-3C21 5 22.8 8.600 21.300 11.800 19 16.400 12 21 12 21z",share:"M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13",spk:"M11 5L6 9H2v6h4l5 4V5zM15.500 8.500a5 5 0 010 7M18.500 5.500a9 9 0 010 13",today:"M12 3v2M12 19v2M3 12h2M19 12h2M12 8a4 4 0 100 8 4 4 0 000-8z",lib:"M4 5h4v14H4zM10 5h4v14h-4zM16.500 6l3.500-1 3 13-3.500 1z",set:"M4 6h16M4 12h16M4 18h16"};
+
+const shareWord=async(x,toast)=>{const text=`${x.w} (${x.p}), ${x.t}: ${x.d}\n\n— Fluency`;
+  try{if(navigator.share){await navigator.share({title:x.w,text});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(text);toast("Copied to clipboard")}catch(e){toast("Sharing unavailable")}};
+const chev=d=>h("svg",{width:20,height:20,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:2.5,strokeLinecap:"round",strokeLinejoin:"round"},h("path",{d}));
+function WordView({i,fav,toggle,detail}){
+  const [k,setK]=useState(0);const x=W[i],n=x.e.length;
+  useEffect(()=>setK(0),[i]);
+  const go=d=>setK(Math.max(0,Math.min(n-1,k+d)));
+  const head=[h("h1",{key:"w",className:"serif text-5xl font-bold leading-tight text-center "+(detail?"mt-8":"mt-6")},x.w),
+    h("button",{key:"p",onClick:()=>speak(x.w),"aria-label":"Pronounce",className:"serif italic mute text-lg mt-3 block mx-auto"},x.p),
+    h("p",{key:"d",className:"serif text-2xl leading-snug mute text-center mt-5"},x.d)];
+  if(!detail)return h("div",{className:"fade"},head,
+    h("button",{onClick:toggle,"aria-label":fav?"Remove from favourites":"Save",className:"block mx-auto mt-6 mute"},h(Ico,{d:P.heart,f:fav,s:28})),
+    h("div",{className:"mt-16"},
+      h("p",{className:"mute text-sm mb-3"},"Example "+(k+1)+" of "+n),
+      h("div",{key:k,className:"card fade px-6 py-7 serif text-xl leading-relaxed",style:{minHeight:120}},x.e[k][1]),
+      h("div",{className:"flex justify-center gap-2 mt-12"},x.e.map((_,j)=>h("button",{key:j,onClick:()=>setK(j),"aria-label":"Example "+(j+1),style:{width:9,height:9,borderRadius:99,background:j===k?"var(--ink)":"var(--edge)"}}))),
+      h("div",{className:"flex justify-center gap-14 mt-7"},[-1,1].map(d=>{const off=k+d<0||k+d>=n;return h("button",{key:d,disabled:off,onClick:()=>go(d),"aria-label":d<0?"Previous example":"Next example",className:"solid rounded-full flex items-center justify-center",style:{width:44,height:44,opacity:off?.3:1}},chev(d<0?"M15 5l-7 7 7 7":"M9 5l7 7-7 7"))}))));
+  return h("div",{className:"fade"},head,
+    h("p",{className:"mute text-xs tracking-widest uppercase text-center mt-8"},"Example "+(k+1)+" of "+n),
+    h("div",{className:"mt-3 h-1.5 rounded-full overflow-hidden",style:{background:"var(--edge)"}},h("div",{style:{width:((k+1)/n*100)+"%",background:"var(--ink)",height:"100%",transition:".3s"}})),
+    h("div",{key:k,className:"fade rounded-3xl px-6 py-7 mt-6 serif text-xl leading-relaxed text-center",style:{background:"var(--tint)",border:"1px solid var(--edge)",minHeight:120}},x.e[k][1]),
+    h("div",{className:"text-center mt-14"},
+      k<n-1?h("button",{className:"solid text-base font-medium",style:{borderRadius:16,padding:".95rem 2rem"},onClick:()=>go(1)},"Next Example →")
+      :h("button",{className:"solid text-base font-medium",style:{borderRadius:16,padding:".95rem 2rem"},onClick:()=>setK(0)},"Start Over ↺"),
+      k<n-1&&h("button",{className:"mute text-sm block mx-auto mt-5",onClick:()=>setK(n-1)},"Skip to End")));
+}
+
+function App(){
+  const [tab,setTab]=useState("today");const [sel,setSel]=useState(null);
+  const [fav,setFav]=useState(()=>ls("fl_fav",[]));
+  const [st,setSt]=useState({n:0});const [rem,setRem]=useState(()=>ls("fl_rem",{on:false,t:"08:00"}));
+  const [msg,setMsg]=useState("");const [flt,setFlt]=useState("all");
+  const [custom,setCustom]=useState(()=>ls("fl_custom",[]).filter(ok));W=B.concat(custom);
+  const [acct,setAcct]=useState(null);const [sy,setSy]=useState("");const [cp,setCp]=useState({});
+  const [q,setQ]=useState("");const [busy,setBusy]=useState(false);const ref=React.useRef(null);
+  const td=today(),idx=td%B.length;
+  const toast=m=>{setMsg(m);setTimeout(()=>setMsg(""),1800)};
+  useEffect(()=>{const s=ls("fl_streak",{last:0,n:0});
+    if(s.last!==td){s.n=s.last===td-1?s.n+1:1;s.last=td;sv("fl_streak",s)}setSt(s)},[]);
+  useEffect(()=>{if(!rem.on)return;const iv=setInterval(()=>{const d=new Date(),hm=d.toTimeString().slice(0,5);
+    if(hm===rem.t&&ls("fl_fired",0)!==td){sv("fl_fired",td);try{new Notification("Fluency",{body:"Today's word: "+W[idx].w})}catch(e){}}},20000);return()=>clearInterval(iv)},[rem]);
+  useEffect(()=>{(async()=>{
+    setCp({sample:await cap("sample"),downloads:await cap("downloads")});
+    const u=await cap("user"),db=await cap("db");if(!u||!db)return;
+    const me=await u.me();if(!me.id)return;
+    const doc=db.doc("data/users/"+me.id+"/fluency");
+    try{setSy("Syncing…");const sn=await doc.get(),r=sn.exists?sn.data():{};
+      const have=new Set(custom.map(x=>x.w.toLowerCase()));
+      const cu=[...custom];(Array.isArray(r.custom)?r.custom.slice(0,200):[]).forEach(x=>{if(ok(x)&&!have.has(x.w.toLowerCase())){have.add(x.w.toLowerCase());cu.push(x)}});
+      const all=B.concat(cu);
+      const fw=[...fav.map(i=>W[i]&&W[i].w),...(Array.isArray(r.favw)?r.favw:[])];
+      const f=[...new Set(fw.map(w=>all.findIndex(x=>x.w===w)).filter(i=>i>=0))];
+      const l=ls("fl_streak",{last:0,n:0}),rs={last:+(r.st&&r.st.last)||0,n:+(r.st&&r.st.n)||0};
+      let m=l;if(rs.last>l.last||(rs.last===l.last&&rs.n>l.n))m=rs;
+      if(rs.last===td-1&&l.last===td&&l.n===1)m={last:td,n:rs.n+1};
+      sv("fl_streak",m);sv("fl_fav",f);sv("fl_custom",cu);
+      W=all;setCustom(cu);setFav(f);setSt(m);ref.current=doc;setAcct(me);setSy("Synced");
+    }catch(e){setSy("Sync unavailable")}})()},[]);
+  useEffect(()=>{const d=ref.current;if(!d||!acct)return;
+    const t=setTimeout(()=>{d.set({favw:fav.map(i=>W[i]&&W[i].w).filter(Boolean),custom,st}).then(()=>setSy("Synced"),()=>setSy("Sync unavailable"))},600);
+    return()=>clearTimeout(t)},[fav,custom,st,acct]);
+  const addWord=async()=>{if(!cp.sample||busy)return;const w=q.trim().slice(0,40);setBusy(true);
+    try{const have=W.map(x=>x.w).join(", ");
+      const r=await cp.sample.json(`You write entries for an elegant vocabulary app. ${w?`Make an entry for the English word "${w}" (correct its spelling if needed).`:"Choose one uncommon, useful, beautiful English word not in this list: "+have+"."} Reply with only JSON: {"w":"Word","p":"syl-LAB-ic pronunciation","t":"noun or verb or adjective or adverb","d":"one-sentence definition","e":[["Register label","example sentence"]]} with exactly 5 examples in varied registers (Literary, Professional, Formal, Reflective, Wry...).`,{modelTier:"quick",cache:false});
+      if(!ok(r)){toast("Try another word");return}
+      if(W.some(x=>x.w.toLowerCase()===r.w.toLowerCase())){toast("Already in your library");return}
+      const n=[...custom,r];setCustom(n);sv("fl_custom",n);setQ("");setFlt("all");toast("Added "+r.w);
+    }catch(e){toast(e&&e.code==="not_granted"?"Permission needed":"Couldn't reach Claude")}finally{setBusy(false)}};
+  const exp=async()=>{const s=fav.map(i=>W[i]).filter(Boolean);if(!s.length){toast("Nothing saved yet");return}
+    const md="# Fluency: saved words\n\n"+s.map(x=>`## ${x.w}\n*${x.p} · ${x.t}*\n\n${x.d}\n\n`+x.e.map(e=>`- **${e[0]}:** ${e[1]}`).join("\n")).join("\n\n")+"\n";
+    try{await cp.downloads.save({filename:"fluency-saved.md",data:md})}catch(e){if(!e||e.code!=="declined")toast("Couldn't save file")}};
+  const toggle=i=>{const n=fav.includes(i)?fav.filter(k=>k!==i):[...fav,i];setFav(n);sv("fl_fav",n)};
+  const setReminder=async on=>{if(on){try{const r=await Notification.requestPermission();if(r!=="granted"){toast("Notifications blocked");return}}catch(e){toast("Notifications unsupported");return}}
+    const n={...rem,on};setRem(n);sv("fl_rem",n)};
+  const rows=(l,empty)=>l.length?h("ul",null,l.map(i=>h("li",{key:i},h("button",{onClick:()=>setSel(i),className:"w-full text-left py-4 border-b line flex items-baseline justify-between"},h("span",{className:"serif text-2xl font-semibold"},W[i].w),h("span",{className:"mute text-xs"},(fav.includes(i)?"♥ ":"")+W[i].t))))):h("p",{className:"mute text-sm"},empty);
+  const detail=sel!==null&&W[sel]&&h("div",null,
+    h("div",{className:"grid grid-cols-3 items-center mb-2"},
+      h("button",{className:"flex items-center text-lg",onClick:()=>setSel(null)},chev("M15 5l-7 7 7 7"),tab==="favs"?"Favourites":"Library"),
+      h("span",{className:"text-center font-semibold"},"Word Details"),
+      h("span",{className:"flex justify-end gap-3"},
+        h("button",{onClick:()=>toggle(sel),"aria-label":"Save"},h(Ico,{d:P.heart,f:fav.includes(sel)})),
+        h("button",{onClick:()=>shareWord(W[sel],toast),"aria-label":"Share"},h(Ico,{d:P.share})))),
+    h(WordView,{i:sel,detail:true}));
+  const nav=(k,l,vb,ic)=>h("button",{key:k,onClick:()=>{setTab(k);setSel(null)},className:"flex-1 flex flex-col items-center gap-1 py-3 text-[11px] font-medium "+(tab===k?"":"mute")},h("svg",{width:26,height:24,viewBox:vb,fill:"currentColor",dangerouslySetInnerHTML:{__html:ic}}),l);
+  return h("div",{className:"max-w-md mx-auto min-h-screen flex flex-col px-7"},
+    
+    h("main",{className:"flex-1 py-8"},
+      sel!==null&&detail,
+      sel===null&&tab==="today"&&h(WordView,{i:idx,fav:fav.includes(idx),toggle:()=>toggle(idx)}),
+      sel===null&&tab==="library"&&(
+        h("div",{className:"fade"},h("h2",{className:"serif text-4xl mb-6"},"Library"),
+          cp.sample&&h("div",{className:"flex gap-2 mb-6"},h("input",{value:q,onChange:e=>setQ(e.target.value),onKeyDown:e=>{if(e.key==="Enter")addWord()},placeholder:"A word, or leave empty to be surprised",className:"soft rounded-full px-4 py-2 text-sm flex-1 min-w-0",style:{color:"var(--ink)"}}),h("button",{className:"btn solid",disabled:busy,onClick:addWord},busy?"…":"Add")),
+          rows(W.map((_,i)=>i),""))),
+      sel===null&&tab==="favs"&&h("div",{className:"fade"},h("h2",{className:"serif text-4xl font-bold mb-6"},"Favourites"),rows(fav.filter(i=>W[i]),"Nothing saved yet. Tap the heart on a word you love.")),
+      sel===null&&tab==="settings"&&h("div",{className:"fade"},h("h2",{className:"serif text-4xl mb-8"},"Settings"),
+        h("div",{className:"py-5 border-b line"},h("div",{className:"flex items-center justify-between"},h("span",null,"Daily reminder"),
+          h("button",{onClick:()=>setReminder(!rem.on),className:"btn "+(rem.on?"solid":"")},rem.on?"On":"Off")),
+          rem.on&&h("div",{className:"flex items-center justify-between mt-4"},h("span",{className:"mute text-sm"},"Time"),
+            h("input",{type:"time",value:rem.t,onChange:e=>{const n={...rem,t:e.target.value};setRem(n);sv("fl_rem",n)},className:"soft rounded-lg px-3 py-2 text-sm",style:{color:"var(--ink)"}})),
+          rem.on&&h("p",{className:"mute text-xs mt-3"},"Reminders fire while Fluency is open. Background push needs the installed app.")),
+        h("div",{className:"py-5 border-b line"},h("div",{className:"flex items-center justify-between"},h("span",null,"Streak"),h("span",{className:"serif text-2xl"},st.n))),
+        h("div",{className:"py-5 border-b line"},h("span",null,"Account"),acct?h("div",{className:"flex items-center gap-3 mt-3"},h("img",{src:acct.avatarUrl,width:32,height:32,className:"rounded-full",alt:""}),h("div",null,h("div",{className:"text-sm"},acct.name||"Signed in"),h("div",{className:"mute text-xs"},sy||"Synced across your devices"))):h("p",{className:"mute text-xs mt-2"},"Progress is saved on this device. Open Fluency while signed in to claude.ai to sync words, favourites and streak across devices.")),
+        cp.downloads&&h("div",{className:"py-5 flex items-center justify-between"},h("span",null,"Export saved words"),h("button",{className:"btn",onClick:exp},"Download")))),
+    msg&&h("div",{className:"fixed left-1/2 -translate-x-1/2 bottom-24 solid rounded-full px-4 py-2 text-xs fade"},msg),
+    h("nav",{className:"sticky bottom-0 flex border-t line",style:{background:"var(--bg)"}},nav("today","Today","0 0 24 22",IC.book),nav("library","Library","0 0 24 24",NI.lib),nav("favs","Favourites","0 0 24 24",NI.heart),nav("settings","Settings","0 0 24 24",NI.gear)));
+}
+const star=(x,y,r)=>`<path d="M${x} ${y-r}Q${x} ${y} ${x+r} ${y}Q${x} ${y} ${x} ${y+r}Q${x} ${y} ${x-r} ${y}Q${x} ${y} ${x} ${y-r}z"/>`;
+const IC={
+book:'<path d="M2 5.5C2 4 3 3 4.5 3H11v14.500c-1.500-.9-3-1.200-4.500-1.200-1.700 0-3 .4-4.500 1.200z"/><path d="M22 5.500C22 4 21 3 19.500 3H13v14.500c1.500-.9 3-1.200 4.500-1.200 1.700 0 3 .4 4.500 1.200z"/>',
+quote:'<path d="M2 8.500a4 4 0 014-4v2a2 2 0 00-2 2H6v5H2zM9 8.500a4 4 0 014-4v2a2 2 0 00-2 2h2v5H9z"/><g stroke="currentColor" stroke-width="1.800" stroke-linecap="round"><path d="M16 6h5M16 10h5M2 17.500h19M2 21.500h19"/></g>',
+cal:'<path fill-rule="evenodd" d="M6 3h12a3.500 3.500 0 013.500 3.500v11A3.500 3.500 0 0118 21H6a3.500 3.500 0 01-3.500-3.500v-11A3.500 3.500 0 016 3zm-.5 5a1 1 0 00-1 1v8.500a1.500 1.500 0 001.500 1.500h12a1.500 1.500 0 001.500-1.500V9a1 1 0 00-1-1z"/><circle cx="9" cy="11" r="1"/><circle cx="12" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><circle cx="7" cy="14" r="1"/><circle cx="10" cy="14" r="1"/><circle cx="13" cy="14" r="1"/><circle cx="16" cy="14" r="1"/>',
+spark:star(15,15,8)+star(6,10,3.500)+star(11,4.500,2.500)
+};
+const NI={
+lib:'<rect x="2.500" y="4" width="4.500" height="16.500" rx="1.200"/><rect x="8.500" y="4" width="4.500" height="16.500" rx="1.200"/><path d="M14.800 5.800a1.200 1.200 0 01.9-1.400l2.800-.7a1.200 1.200 0 011.500.9l3.400 13.800a1.200 1.200 0 01-.9 1.500l-2.800.7a1.200 1.200 0 01-1.500-.9z"/>',
+heart:'<path d="M12 21s-8-5.200-9.800-10.400C1.200 7.500 3.200 4 6.700 4c2 0 3.700 1 5.300 3 1.600-2 3.300-3 5.300-3 3.500 0 5.500 3.500 4.500 6.600C20 15.800 12 21 12 21z"/>',
+gear:'<path fill-rule="evenodd" d="M10.300 2h3.400l.5 2.400 1.700.7 2.100-1.300 2.400 2.400-1.300 2.100.7 1.700 2.400.5v3.400l-2.400.5-.7 1.700 1.300 2.100-2.400 2.400-2.100-1.300-1.700.7-.5 2.400h-3.400l-.5-2.400-1.700-.7-2.100 1.300-2.400-2.400 1.300-2.100-.7-1.700L2 13.700v-3.400l2.400-.5.7-1.700-1.300-2.100 2.400-2.400 2.100 1.300 1.700-.7zM12 8.500a3.500 3.500 0 100 7 3.500 3.500 0 000-7z"/>'};
+const OB=[["book","Word of the Day","Expand your vocabulary with carefully curated words and their meanings"],["quote","Learn in Context","See each word used in five different real-world examples"],["cal","Daily Learning","Build your knowledge consistently with a new word every day"],["spark","Ready to Begin?","Start your journey to eloquence today"]];
+function Onboarding({done}){
+  const [i,setI]=useState(0);const [x0,setX0]=useState(null);const last=i===OB.length-1,o=OB[i];
+  const next=()=>last?done():setI(i+1);
+  const end=e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;setX0(null);if(dx<-50)next();else if(dx>50&&i>0)setI(i-1)};
+  return h("div",{className:"fixed inset-0 flex flex-col",style:{background:"var(--bg)",paddingTop:"env(safe-area-inset-top,0px)",paddingBottom:"calc(env(safe-area-inset-bottom,0px) + 1.25rem)"},onTouchStart:e=>setX0(e.touches[0].clientX),onTouchEnd:end},
+    h("div",{key:i,className:"flex-1 flex flex-col items-center justify-center text-center px-10 fade"},
+      h("svg",{viewBox:o[0]==="book"?"0 0 24 22":"0 0 24 24",width:104,height:104,fill:"currentColor",dangerouslySetInnerHTML:{__html:IC[o[0]]}}),
+      h("h1",{className:"text-3xl font-bold mt-10 tracking-tight"},o[1]),
+      h("p",{className:"mute text-lg mt-5 leading-snug max-w-xs"},o[2])),
+    h("div",{className:"flex justify-center mb-8"},h("div",{className:"soft flex gap-3 rounded-full px-4 py-3"},OB.map((_,k)=>h("span",{key:k,style:{width:10,height:10,borderRadius:99,background:k===i?"var(--bg)":"var(--mute)",opacity:k===i?1:.5,transition:".2s"}})))),
+    h("button",{className:"solid mx-5 text-lg font-semibold",style:{borderRadius:22,padding:"1.15rem",border:0},onClick:next},last?"Get Started":"Continue"));
+}
+function Root(){const [ob,setOb]=useState(()=>ls("fl_ob",false));
+  return ob?h(App):h(Onboarding,{done:()=>{sv("fl_ob",true);setOb(true)}})}
+ReactDOM.createRoot(document.getElementById("root")).render(h(Root));
+</script></body></html>
