@@ -2,19 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Splash</title>
-<style>
-  html,body{margin:0;height:100%;background:#fff}
-  body{display:flex;align-items:center;justify-content:center}
-  svg{width:min(78vw,420px);height:auto;max-height:90vh}
-</style>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Fluency</title>
 <meta name="description" content="Fluency">
@@ -83,16 +70,37 @@
     to { opacity: 1; transform: none; }
   }
 
-  /* Splash: shown for 9 seconds, then fades out */
+  /* Startup flow: spc2.svg (5s) -> box loader (3s) -> app */
   #splash {
     position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center;
-    background: var(--bg); transition: opacity .8s ease, visibility .8s;
+    background: var(--bg); transition: opacity .6s ease, visibility .6s;
   }
   #splash.hide { opacity: 0; visibility: hidden; }
-  #splash img {
-    max-width: 100%; max-height: 100%; object-fit: contain;
+  #splash .stage {
+    grid-area: 1 / 1; display: grid; place-items: center; width: 100%; height: 100%;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    transition: opacity .5s ease, visibility .5s;
   }
+  #splash .stage.off { opacity: 0; visibility: hidden; }
+  #stage-logo img { max-width: 80%; max-height: 80%; object-fit: contain; }
+
+  /* Box loader (no colour: uses the theme ink colour) */
+  .wrapper { position: relative; }
+  .box-wrap { display: flex; gap: 8px; align-items: center; justify-content: center; height: 40px; }
+  .box {
+    width: 10px; height: 10px; border-radius: 2px; background: var(--ink); opacity: .2;
+    animation: box-pulse 1.2s ease-in-out infinite;
+  }
+  .box.two   { animation-delay: .1s; }
+  .box.three { animation-delay: .2s; }
+  .box.four  { animation-delay: .3s; }
+  .box.five  { animation-delay: .4s; }
+  .box.six   { animation-delay: .5s; }
+  @keyframes box-pulse {
+    0%, 60%, 100% { transform: scaleY(1); opacity: .2; }
+    30%           { transform: scaleY(3); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .box { animation: none; opacity: .6; } }
 
   /* iOS Style Toggle */
   .ios-toggle {
@@ -112,21 +120,50 @@
 
 <body>
 
-<!-- Splash screen -->
+<!-- Startup flow: 1) spc2.svg for 5s, 2) box loader for 3s -->
 <div id="splash" aria-label="Fluency is loading" role="img">
-  <img src="https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/splash/splash.webp"
-       alt="Fluency" decoding="async" fetchpriority="high">
+  <div class="stage" id="stage-logo">
+    <img id="logo-img" src="spc2.svg" alt="Fluency" decoding="async" fetchpriority="high">
+  </div>
+  <div class="stage off" id="stage-loader">
+    <div class="wrapper">
+      <div class="box-wrap">
+        <div class="box one"></div>
+        <div class="box two"></div>
+        <div class="box three"></div>
+        <div class="box four"></div>
+        <div class="box five"></div>
+        <div class="box six"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="root"></div>
 
 <script>
-  const SPLASH_MS = 8000;
+  const LOGO_MS = 5000;    // spc2.svg
+  const LOADER_MS = 3000;  // box loader
   const splash = document.getElementById('splash');
-  setTimeout(() => {
-    splash.classList.add('hide');
-    setTimeout(() => splash.remove(), 700);
-  }, SPLASH_MS);
+  const stageLogo = document.getElementById('stage-logo');
+  const stageLoader = document.getElementById('stage-loader');
+  let started = false;
+  function startFlow() {
+    if (started) return; started = true;
+    setTimeout(() => {
+      stageLogo.classList.add('off');
+      stageLoader.classList.remove('off');
+      setTimeout(() => {
+        splash.classList.add('hide');
+        setTimeout(() => splash.remove(), 700);
+      }, LOADER_MS);
+    }, LOGO_MS);
+  }
+  // start the 5s clock once the SVG is actually on screen (so its draw animation isn't cut short)
+  const logoImg = document.getElementById('logo-img');
+  logoImg.addEventListener('load', startFlow);
+  logoImg.addEventListener('error', startFlow);
+  setTimeout(startFlow, 2000); // safety net
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () =>
@@ -548,8 +585,5 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
-</body>
-</html>
-
 </body>
 </html>
