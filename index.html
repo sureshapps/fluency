@@ -252,9 +252,24 @@ const { useState, useEffect, useRef } = React;
 
 // Initial built-in words
 const B = [
-  { w: "Susurrus", p: "soo-SUR-us", t: "noun", d: "A soft, whispering or rustling sound, like leaves stirring or distant voices.", e: [["Literary", "The susurrus of the reeds followed us along the empty riverbank."], ["Atmospheric", "A susurrus of gossip moved through the gallery before the curtain was drawn."]] },
-  { w: "Perspicacious", p: "pur-spih-KAY-shus", t: "adjective", d: "Having a ready, penetrating insight; quick to see through the surface of things.", e: [["Professional", "Her perspicacious reading of the market saved the firm a year of losses."], ["Literary", "He was a perspicacious observer, noting what others were too polite to see."]] },
-  { w: "Halcyon", p: "HAL-see-un", t: "adjective", d: "Denoting a period of calm, happiness and untroubled peace, often remembered fondly.", e: [["Nostalgic", "They spoke of those halcyon summers as though the sun had never set."], ["Literary", "A halcyon stillness settled on the harbour at dawn."]] }
+  { w: "Susurrus", p: "soo-SUR-us", t: "noun", d: "A soft, whispering or rustling sound, like leaves stirring or distant voices.", e: [
+    ["Literary", "The susurrus of the reeds followed us along the empty riverbank."],
+    ["Atmospheric", "A susurrus of gossip moved through the gallery before the curtain was drawn."],
+    ["Everyday", "She fell asleep to the susurrus of rain against the attic window."],
+    ["Musical", "Beneath the choir's final note lingered a susurrus of held breath."],
+    ["Quiet", "The library was so hushed that even the susurrus of turning pages felt loud."]] },
+  { w: "Perspicacious", p: "pur-spih-KAY-shus", t: "adjective", d: "Having a ready, penetrating insight; quick to see through the surface of things.", e: [
+    ["Professional", "Her perspicacious reading of the market saved the firm a year of losses."],
+    ["Literary", "He was a perspicacious observer, noting what others were too polite to see."],
+    ["School", "A perspicacious teacher, she noticed the shy student's talent within a week."],
+    ["Detective", "It took a perspicacious eye to spot the forgery among hundreds of genuine letters."],
+    ["Business", "His perspicacious questions exposed the flaw in the plan before anyone signed."]] },
+  { w: "Halcyon", p: "HAL-see-un", t: "adjective", d: "Denoting a period of calm, happiness and untroubled peace, often remembered fondly.", e: [
+    ["Nostalgic", "They spoke of those halcyon summers as though the sun had never set."],
+    ["Literary", "A halcyon stillness settled on the harbour at dawn."],
+    ["Reflective", "Looking back, the halcyon years of childhood seemed to last forever."],
+    ["Community", "The village enjoyed a halcyon spell of peace before the storms of winter."],
+    ["Dreamy", "She dreamed of halcyon afternoons spent reading beneath the old oak."]] }
 ];
 
 const ls = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -286,12 +301,54 @@ const P = {
   trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2",
 };
 
-function WordView({ word, fav, toggle, detail, goBack }) {
+const Fill = ({ vb = 64, s = 24, className = "", children }) => (
+  <svg width={s} height={s} viewBox={`0 0 ${vb} ${vb}`} fill="currentColor" className={className}>{children}</svg>
+);
+const IcBook = p => (<Fill {...p}>
+  <path d="M2 48V24C2 12 9 4 20 4h9v42c-6-5-15-5-21 2-3 3-6 2-6-2z" transform="translate(0 6)"/>
+  <path d="M2 48V24C2 12 9 4 20 4h9v42c-6-5-15-5-21 2-3 3-6 2-6-2z" transform="translate(64 6) scale(-1 1)"/>
+</Fill>);
+const IcLib = p => (<Fill {...p}>
+  <rect x="2" y="14" width="11" height="46" rx="3.5"/>
+  <rect x="16" y="24" width="13" height="36" rx="3.5"/>
+  <rect x="20" y="31" width="5" height="3" rx="1.5" fill="var(--bg)"/>
+  <rect x="20" y="47" width="5" height="3" rx="1.5" fill="var(--bg)"/>
+  <rect x="32" y="4" width="13" height="56" rx="3.5"/>
+  <path d="M48 17l9-2c3-.6 4.500.6 5 3.500l3 37c.3 3-1 4.500-4 4.500h-5c-3 0-4-1.500-4.300-4.500z" transform="translate(-3 0)"/>
+</Fill>);
+const IcHeart = p => (<Fill {...p}><g transform="translate(0 3) scale(2.6667)"><path d="M12 21s-7-4.600-9.300-9.200C1.200 8.600 3 5 6.400 5c2 0 3.600 1 5.600 3 2-2 3.600-3 5.600-3C21 5 22.800 8.600 21.300 11.800 19 16.400 12 21 12 21z"/></g></Fill>);
+const IcCloud = p => (<Fill {...p}><g transform="scale(2.6667)"><path d="M7 19a5 5 0 0 1-.5-9.970A6 6 0 0 1 18 9a4.500 4.500 0 0 1 0 10z"/></g></Fill>);
+const IcGear = p => (<Fill {...p}>
+  <circle cx="32" cy="32" r="19"/>
+  {[0, 45, 90, 135].map(a => <rect key={a} x="26" y="4" width="12" height="56" rx="4" transform={`rotate(${a} 32 32)`}/>)}
+  <circle cx="32" cy="32" r="8" fill="var(--bg)"/>
+</Fill>);
+const IcSpark = p => {
+  const star = "M32 0C34 20 44 30 64 32C44 34 34 44 32 64C30 44 20 34 0 32C20 30 30 20 32 0Z";
+  return (<Fill {...p}>
+    <path d={star} transform="translate(22 24) scale(.66)"/>
+    <path d={star} transform="translate(2 12) scale(.36)"/>
+    <path d={star} transform="translate(28 -2) scale(.28)"/>
+  </Fill>);
+};
+
+const GoogleBtn = ({ onClick, lg }) => (
+  <button type="button" onClick={onClick}
+    className={`text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 box-border border border-transparent font-medium leading-5 text-center inline-flex items-center justify-center ${lg ? "rounded-2xl text-base px-9 py-4" : "rounded-lg text-xs px-3.5 py-2"}`}>
+    <svg className={lg ? "w-5 h-5 me-2" : "w-3.5 h-3.5 me-1.5"} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+      <path fillRule="evenodd" d="M12.037 21.998a10.313 10.313 0 0 1-7.168-3.049 9.888 9.888 0 0 1-2.868-7.118 9.947 9.947 0 0 1 3.064-6.949A10.37 10.37 0 0 1 12.212 2h.176a9.935 9.935 0 0 1 6.614 2.564L16.457 6.88a6.187 6.187 0 0 0-4.131-1.566 6.9 6.9 0 0 0-4.794 1.913 6.618 6.618 0 0 0-2.045 4.657 6.608 6.608 0 0 0 1.882 4.723 6.891 6.891 0 0 0 4.725 2.07h.143c1.41.072 2.8-.354 3.917-1.2a5.77 5.77 0 0 0 2.172-3.41l.043-.117H12.22v-3.41h9.678c.075.617.109 1.238.1 1.859-.099 5.741-4.017 9.6-9.746 9.6l-.215-.002Z" clipRule="evenodd"/>
+    </svg>
+    Sign in with Google
+  </button>
+);
+
+function WordView({ word, fav, toggle, detail, goBack, onShare, user, signIn }) {
   const [k, setK] = useState(0);
   const n = word.e.length;
+  const last = detail ? n - 1 : n;          // on Today, step n = "Thanks for reading!"
   useEffect(() => setK(0), [word]);
-
-  const go = d => setK(Math.max(0, Math.min(n - 1, k + d)));
+  const go = d => setK(Math.max(0, Math.min(last, k + d)));
+  const thanks = !detail && k === n;
 
   return (
     <div className="fade flex flex-col h-full">
@@ -303,33 +360,58 @@ function WordView({ word, fav, toggle, detail, goBack }) {
           <span className="text-center font-semibold text-sm">Word Details</span>
           <div className="flex justify-end gap-4 text-blue-500">
             <button onClick={toggle}><Ico d={P.heart} f={fav} s={22}/></button>
-            <button onClick={() => navigator.clipboard.writeText(word.w)}><Ico d={P.share} s={22}/></button>
+            <button onClick={onShare}><Ico d={P.share} s={22}/></button>
           </div>
         </div>
       )}
 
       <h1 className="serif text-5xl font-bold leading-tight text-center mt-4">{word.w}</h1>
       <button onClick={() => speak(word.w)} className="serif italic mute text-lg mt-3 block mx-auto">{word.p || "Pronounce"}</button>
-      <p className="serif text-2xl leading-snug text-center mt-5 px-4">{word.d}</p>
+      <p className="serif text-2xl leading-snug text-center mt-6 px-2">{word.d}</p>
 
       {!detail && (
-        <button onClick={toggle} className={`block mx-auto mt-8 transition-colors ${fav ? 'text-red-500' : 'mute'}`}>
-          <Ico d={P.heart} f={fav} s={32} />
+        <button onClick={toggle} aria-label="Favourite" className={`block mx-auto mt-10 transition-colors ${fav ? "text-red-500" : "mute"}`}>
+          <Ico d={P.heart} f={fav} s={34} />
         </button>
       )}
 
-      <div className="mt-auto pb-8 pt-12">
-        <p className="mute text-xs tracking-widest uppercase text-center mb-4">Example {k + 1} of {n}</p>
-        <div className="soft rounded-3xl px-6 py-8 mx-2 serif text-xl leading-relaxed text-center relative shadow-sm border border-[var(--line)]" style={{ minHeight: 140 }}>
-          <span className="absolute top-3 left-4 text-xs font-sans font-semibold mute uppercase">{word.e[k][0]}</span>
-          <div className="mt-2">{word.e[k][1]}</div>
-        </div>
+      <div className="mt-12">
+        {thanks ? (
+          <div key="thanks" className="fade rounded-2xl border border-[var(--edge)] bg-[var(--bg)] shadow-sm px-6 pt-8 pb-6 text-center">
+            <IcSpark s={44} className="mx-auto" />
+            <h3 className="text-xl font-bold mt-6">Thanks for reading!</h3>
+            <p className="mute text-base mt-4">Come back tomorrow for your new word.</p>
+            <button onClick={onShare} className="mt-6 inline-flex items-center gap-2 bg-[var(--ink)] text-[var(--bg)] rounded-xl px-6 py-3 font-medium">
+              <Ico d={P.share} s={18} /> Share Word
+            </button>
+            {!user && (
+              <div className="mt-8">
+                <p className="mute text-sm mb-3">Want more features?</p>
+                <GoogleBtn onClick={signIn} />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div key={k} className="fade">
+            <p className="mute text-base mb-3 px-2">Example {k + 1} of {n}</p>
+            <div className="rounded-2xl border border-[var(--edge)] bg-[var(--bg)] shadow-sm px-5 py-5 serif text-xl leading-relaxed text-left" style={{ minHeight: 132, opacity: .75 }}>
+              {word.e[k][1]}
+            </div>
+          </div>
+        )}
+      </div>
 
-        <div className="flex justify-center gap-8 mt-10">
-          <button disabled={k === 0} onClick={() => go(-1)} className="p-3 bg-[var(--ink)] text-[var(--bg)] rounded-full disabled:opacity-30">
+      <div className="mt-auto pt-8 pb-4">
+        <div className="flex justify-center gap-2.5">
+          {word.e.map((_, i) => (
+            <span key={i} className="rounded-full transition-colors" style={{ width: 8, height: 8, background: !thanks && i === k ? "var(--ink)" : "#c7c7cc" }} />
+          ))}
+        </div>
+        <div className="flex justify-center gap-8 mt-6">
+          <button aria-label="Previous" disabled={k === 0} onClick={() => go(-1)} className="p-3 bg-[var(--ink)] text-[var(--bg)] rounded-full disabled:opacity-30">
             <Ico d={P.chevronLeft} s={24} />
           </button>
-          <button disabled={k === n - 1} onClick={() => go(1)} className="p-3 bg-[var(--ink)] text-[var(--bg)] rounded-full disabled:opacity-30">
+          <button aria-label="Next" disabled={k === last} onClick={() => go(1)} className="p-3 bg-[var(--ink)] text-[var(--bg)] rounded-full disabled:opacity-30">
             <Ico d={P.chevronRight} s={24} />
           </button>
         </div>
@@ -370,32 +452,34 @@ function App() {
     setFav(n); if (user) sv(accountKey("fav"), n);
   };
 
-  // Google Login Effect (waits for the Google script and the button div)
-  useEffect(() => {
-    if ((tab !== "settings" && tab !== "library") || user) return;
-    let tries = 0;
-    const t = setInterval(() => {
-      const btn = document.getElementById("google-btn");
-      if (window.google?.accounts?.id && btn) {
-        clearInterval(t);
-        try {
-          window.google.accounts.id.initialize({
-            client_id: "1080503592184-f0q9nsb8o6c17lu69rta280n1n4daerk.apps.googleusercontent.com",
-            callback: (res) => {
-              const payload = JSON.parse(atob(res.credential.split('.')[1]));
-              const newUser = { name: payload.name, email: payload.email, picture: payload.picture };
-              setUser(newUser); sv("fl_user", newUser);
-              toast("Signed in successfully");
-            }
-          });
-          window.google.accounts.id.renderButton(btn, { theme: "outline", size: "large", width: 300 });
-        } catch (e) { console.log("Google Init Error", e); }
-      } else if (++tries > 40) {
-        clearInterval(t);
-      }
-    }, 250);
-    return () => clearInterval(t);
-  }, [tab, user]);
+  // Google sign-in (custom button -> Google popup, same client ID as before)
+  const signIn = () => {
+    if (!window.google?.accounts?.oauth2) { toast("Google sign-in is still loading. Try again."); return; }
+    try {
+      const tc = window.google.accounts.oauth2.initTokenClient({
+        client_id: "1080503592184-f0q9nsb8o6c17lu69rta280n1n4daerk.apps.googleusercontent.com",
+        scope: "openid email profile",
+        callback: async (r) => {
+          if (r.error || !r.access_token) { toast("Sign-in cancelled"); return; }
+          try {
+            const p = await (await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: `Bearer ${r.access_token}` } })).json();
+            const newUser = { name: p.name, email: p.email, picture: p.picture };
+            setUser(newUser); sv("fl_user", newUser);
+            toast("Signed in successfully");
+          } catch (e) { toast("Sign-in failed. Try again."); }
+        }
+      });
+      tc.requestAccessToken();
+    } catch (e) { console.log("Google Init Error", e); toast("Sign-in failed. Try again."); }
+  };
+
+  const shareWord = async w => {
+    const text = `${w.w} \u2014 ${w.d}`;
+    try {
+      if (navigator.share) await navigator.share({ title: w.w, text });
+      else { await navigator.clipboard.writeText(text); toast("Copied to clipboard"); }
+    } catch (e) {}
+  };
 
   // Demo login for testing UI
   const demoLogin = () => {
@@ -453,10 +537,10 @@ function App() {
   };
 
   const navs = [
-    { id: "today", l: "Today", ic: <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z" /> },
-    { id: "library", l: "Library", ic: <path d="M4 5v14M8 5v14M12 5v14M16 5l3 14M20 5l-3 14" /> },
-    { id: "favs", l: "Favourites", ic: <path d={P.heart} /> },
-    { id: "settings", l: "Settings", ic: <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /> }
+    { id: "today", l: "Today", Ic: IcBook },
+    { id: "library", l: "Library", Ic: IcLib },
+    { id: "favs", l: "Favourites", Ic: IcHeart },
+    { id: "settings", l: "Settings", Ic: IcGear }
   ];
 
   const otherApps = [1, 2, 3];
@@ -475,21 +559,36 @@ function App() {
       <main className="flex-1 overflow-y-auto overflow-x-hidden pb-4 px-6 pt-6">
 
         {sel !== null && (
-          <WordView word={W[sel]} fav={fav.includes(sel)} toggle={() => toggle(sel)} detail={true} goBack={() => setSel(null)} />
+          <WordView word={W[sel]} fav={fav.includes(sel)} toggle={() => toggle(sel)} detail={true} goBack={() => setSel(null)} onShare={() => shareWord(W[sel])} />
         )}
 
         {sel === null && tab === "today" && (
-          <WordView word={W[idx]} fav={fav.includes(idx)} toggle={() => toggle(idx)} />
+          <WordView word={W[idx]} fav={fav.includes(idx)} toggle={() => toggle(idx)} onShare={() => shareWord(W[idx])} user={user} signIn={signIn} />
         )}
 
         {sel === null && tab === "library" && (
           <div className="fade pb-10">
-            <h2 className="serif text-4xl font-bold mb-6">Library</h2>
+            <h2 className="text-4xl font-bold mb-6">Library</h2>
             {!user ? (
-              <div className="soft rounded-2xl border line px-5 py-8 text-center">
-                <p className="font-medium">Sign in to start your Library</p>
-                <p className="mute text-sm mt-2">Your words will be kept separately for your account on this device.</p>
-                <div id="google-btn" className="mt-5 flex justify-center"></div>
+              <div className="flex flex-col items-center text-center pt-4">
+                <IcLib s={76} />
+                <h3 className="serif text-3xl font-bold mt-8">Library</h3>
+                <p className="serif mute text-lg leading-snug mt-4">Create an account to track your learning journey and see all the words you've discovered.</p>
+                <ul className="w-full mt-8 space-y-5 text-left">
+                  {[[IcHeart, "Save your favorite words", "Never lose track of words you love"],
+                    [IcBook, "Track your learning journey", "See all the words you've discovered"],
+                    [IcCloud, "Sync across devices", "Access your data anywhere"]].map(([I, t, sub]) => (
+                    <li key={t} className="flex items-center gap-4">
+                      <I s={30} className="mute shrink-0" />
+                      <div>
+                        <div className="serif font-bold text-lg leading-tight">{t}</div>
+                        <div className="serif mute text-base leading-tight mt-1">{sub}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-10"><GoogleBtn lg onClick={signIn} /></div>
+                <p className="mute text-xs mt-5">Your data is secure and private. We only store your learning progress.</p>
               </div>
             ) : (
               <>
@@ -561,7 +660,7 @@ function App() {
                 </div>
               ) : (
                 <div className="p-5 flex flex-col items-center justify-center gap-3">
-                  <div id="google-btn"></div>
+                  <GoogleBtn onClick={signIn} />
                 </div>
               )}
             </div>
@@ -647,10 +746,8 @@ function App() {
       {/* Bottom Nav */}
       <nav className="flex border-t line bg-[var(--bg)] pb-safe relative z-20">
         {navs.map(n => (
-          <button key={n.id} onClick={() => { setTab(n.id); setSel(null); }} className={`flex-1 flex flex-col items-center gap-1.5 py-3 pt-4 text-[10px] font-medium transition-colors ${tab === n.id ? "text-[var(--ink)]" : "mute"}`}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {n.ic}
-            </svg>
+          <button key={n.id} onClick={() => { setTab(n.id); setSel(null); }} className={`flex-1 flex flex-col items-center gap-1.5 py-3 pt-4 text-[11px] font-semibold transition-colors ${tab === n.id ? "text-[var(--ink)]" : "mute"}`}>
+            <n.Ic s={26} />
             {n.l}
           </button>
         ))}
