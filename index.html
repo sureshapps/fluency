@@ -73,7 +73,7 @@
   /* Splash: shown for 9 seconds, then fades out */
   #splash {
     position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center;
-    background: var(--bg); transition: opacity .6s ease, visibility .6s;
+    background: var(--bg); transition: opacity .8s ease, visibility .8s;
   }
   #splash.hide { opacity: 0; visibility: hidden; }
   #splash img {
@@ -108,7 +108,7 @@
 <div id="root"></div>
 
 <script>
-  const SPLASH_MS = 12000;
+  const SPLASH_MS = 9000;
   const splash = document.getElementById('splash');
   setTimeout(() => {
     splash.classList.add('hide');
