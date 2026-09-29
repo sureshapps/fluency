@@ -103,9 +103,8 @@
 <div id="splash" aria-label="Fluency is loading" role="img">
   <picture>
     <!-- wide screens: animated GIF; phones/portrait: WebP -->
-    <source media="(min-width:768px) and (orientation:landscape)"
-            srcset="https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/splash/splashh.gif">
-    <img src="https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/splash/splash.webp"
+    <source media="(min-width:100%) and (orientation:landscape)"
+            srcset="https://raw.githubusercontent.com/sureshapps/fluency/refs/heads/main/splash/splash.webp">
          alt="Fluency" decoding="async" fetchpriority="high">
   </picture>
 </div>
@@ -113,7 +112,7 @@
 <div id="root"></div>
 
 <script>
-  const SPLASH_MS = 9000;
+  const SPLASH_MS = 12000;
   const splash = document.getElementById('splash');
   setTimeout(() => {
     splash.classList.add('hide');
